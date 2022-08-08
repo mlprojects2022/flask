@@ -7,7 +7,7 @@ from flask_cors import CORS,cross_origin
 app = Flask(__name__)
 cors=CORS(app,resources={r'*':{"origins":"*"}})
 import os,io
-from multiprocessing import Process
+from multiprocessing import Process,Pipe
 def read_file(filename):
     blob=bucket.blob(filename)
     return blob.download_as_string()
@@ -37,9 +37,13 @@ def home():
         print(path)
         print("POST")
         id=mongoDB.insert({"name":secure_filename(file.filename),"upload_date":dt.now().strftime(("%d/%m/%Y %H:%M:%S")),"queue":"Scan","status":"On Queue","doc_type":"Lease Agreement"}).inserted_id
-        import pre_process 
-        p=Process(target=pre_process.preprocess,args={(path,id),})
+        import pre_process
+        parent,child=Pipe() 
+        p=Process(target=pre_process.preprocess,args={(path,id,parent),})
+        p2=Process(target=pre_process.worker_pre,args={(child,id),})
+        p2.start()
         p.start()
+        p.join()
         return redirect("/")
     else:
         return render_template('home.html')

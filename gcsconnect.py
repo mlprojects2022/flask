@@ -53,7 +53,26 @@ def ocr_maker(pageinfo):
         write_file(value+'_ocr.txt',texts[0].description)
     print('ocr_completed')
     return 'ocr-completed'
-def convert_pdf_to_image_split(savepath,filename):
+def ocr_maker_1(pageinfo):
+    print("pageinfo",pageinfo)
+    bucket_name=os.environ['bucket_name']
+    client = vision.ImageAnnotatorClient()
+    print(client)
+    st=time.time()
+    image = vision.Image()
+    value=pageinfo
+    image.source.image_uri="gs://"+bucket_name+"/"+value
+    print(value)
+    #print(image)
+    # Performs label detection on the image file
+    response = client.text_detection(image=image)
+    print(time.time()-st)
+    # print(response)
+    texts = response.text_annotations
+    write_file(value+'_ocr.txt',texts[0].description)
+    print('ocr_completed',pageinfo)
+    #return 'ocr-completed'
+def convert_pdf_to_image_split(savepath,filename,parent,id):
     images = convert_from_bytes(read_file_io(filename).read(),poppler_path='poppler-22.04.0/Library/bin')
     pageinfo=dict()
     for page in range(len(images)):
@@ -63,9 +82,12 @@ def convert_pdf_to_image_split(savepath,filename):
             images[page].save(page_byte,"JPEG")
             page_byte.seek(0)
             write_file_io(savepath+filename.split('/')[-1]+f'__{page}.jpg',page_byte)
+            print(parent)
+            parent.send(savepath+filename.split('/')[-1]+f'__{page}.jpg')
             pageinfo[page]=savepath+filename.split('/')[-1]+f'__{page}.jpg'
             del page_byte
         except Exception as e:
             print(str(e))
+    parent.send("END")
     return pageinfo
 #pageinfo=convert_pdf_to_image_split('Contract/Residential-Lease-Agreement-4/','Contract/Residential-Lease-Agreement-4.pdf')
