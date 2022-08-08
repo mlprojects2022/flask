@@ -21,13 +21,14 @@
     <script>
         var url = '';
         async function generateSignedUrl() {
-            action = 'put';
+            action = 'post';
             filename = getFilename();
             if (filename) {
                 res = await fetch('/getSignedurl?filename=' + filename + "&action=" + action);
                 if (res.ok) {
                     url = await res.text();
-                    upload();
+                    //upload();
+                    document.getElementById("form1").action=url;
                 }
             }
         }

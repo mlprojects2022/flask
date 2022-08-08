@@ -15,6 +15,8 @@ def insert(query):
 # #res=collections.find_one({"name":"b"})
 # res=insert({"name":"b","upload_date":datetime.now().strftime(("%d/%m/%Y %H:%M:%S")),"queue":"Scan","status":"On Queue","doc_type":"Lease"}
 # )
+def update(id,que,status):
+    return Connection().update_one({'_id':id},{"$set":{'queue':que,'status':status}})
 def delete(query):
     return Connection().delete_many(query)
 #print(delete({"name":"b"}))
