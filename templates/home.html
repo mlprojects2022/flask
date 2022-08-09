@@ -12,5 +12,9 @@
             </form>
         </div>
     </div>
+    {% if status %}
+    <h4 class="text-success" style="text-align: center;">File Uploaded Successfully</h4>
+    {% endif %}
+    <script>console.log(status);</script>
 </div>
 {% endblock %}

@@ -1,9 +1,13 @@
+from unittest import result
 from flask import Flask, render_template, url_for, request, redirect
 from werkzeug.utils import secure_filename
 import datetime
+from pre_process import preprocess
 from datetime import datetime as dt
 from DBcode import mongoDB
 from flask_cors import CORS,cross_origin
+from apscheduler.schedulers.background import BackgroundScheduler
+import atexit
 app = Flask(__name__)
 cors=CORS(app,resources={r'*':{"origins":"*"}})
 import os,io
@@ -23,6 +27,20 @@ try:
     bucket = storage_client.bucket(bucket_name)
 except Exception as e:
     print("GCP connection error",str(e))
+def sched():
+    print("Schedular started")
+    p=Process(target=preprocess)
+    p.start()
+    p.join()
+
+#schedular for preprocessing
+scheduler = BackgroundScheduler()
+scheduler.add_job(sched,trigger="interval",seconds=60,max_instances=1)
+print("schedular before start")
+scheduler.start()
+print("schedular after start")
+atexit.register(lambda:scheduler.shutdown())
+print("scheduler finished")
 
 @app.route("/", methods=["GET","POST","PUT"])
 def home():
@@ -36,15 +54,8 @@ def home():
         path="Contract/"+file.filename
         print(path)
         print("POST")
-        id=mongoDB.insert({"name":secure_filename(file.filename),"upload_date":dt.now().strftime(("%d/%m/%Y %H:%M:%S")),"queue":"Scan","status":"On Queue","doc_type":"Lease Agreement"}).inserted_id
-        import pre_process
-        parent,child=Pipe() 
-        p=Process(target=pre_process.preprocess,args={(path,id,parent),})
-        p2=Process(target=pre_process.worker_pre,args={(child,id),})
-        p2.start()
-        p.start()
-        p.join()
-        return redirect("/")
+        #mongoDB.insert({"name":secure_filename(file.filename),"upload_date":dt.now().strftime(("%d/%m/%Y %H:%M:%S")),"queue":"Scan","status":"On Queue","doc_type":"Lease Agreement"})
+        return render_template("home.html",status=1)
     else:
         return render_template('home.html')
     return render_template('home.html')

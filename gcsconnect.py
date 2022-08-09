@@ -72,7 +72,10 @@ def ocr_maker_1(pageinfo):
     write_file(value+'_ocr.txt',texts[0].description)
     print('ocr_completed',pageinfo)
     #return 'ocr-completed'
-def convert_pdf_to_image_split(savepath,filename,parent,id):
+def convert_pdf_to_image_split(data):
+    savepath,filename,parent=data[0],data[1],data[2]
+    import time
+    st=time.time()
     images = convert_from_bytes(read_file_io(filename).read(),poppler_path='poppler-22.04.0/Library/bin')
     pageinfo=dict()
     for page in range(len(images)):
@@ -88,6 +91,8 @@ def convert_pdf_to_image_split(savepath,filename,parent,id):
             del page_byte
         except Exception as e:
             print(str(e))
+    
     parent.send("END")
-    return pageinfo
+    print("split time",time.time()-st)
+    #return pageinfo
 #pageinfo=convert_pdf_to_image_split('Contract/Residential-Lease-Agreement-4/','Contract/Residential-Lease-Agreement-4.pdf')

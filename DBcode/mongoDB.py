@@ -11,6 +11,8 @@ def Connection():
     return collections
 def insert(query):
     return Connection().insert_one(query)
+def updateReturn(filter,data):
+    return Connection().find_one_and_update(filter,{'$set':data}) 
 # post={"name":"b","upload_date":datetime.now().strftime(("%d/%m/%Y %H:%M:%S")),"queue":"Scan","status":"On Queue","doc_type":"Lease"}
 # #res=collections.find_one({"name":"b"})
 # res=insert({"name":"b","upload_date":datetime.now().strftime(("%d/%m/%Y %H:%M:%S")),"queue":"Scan","status":"On Queue","doc_type":"Lease"}
