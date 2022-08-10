@@ -91,8 +91,26 @@ def convert_pdf_to_image_split(data):
             del page_byte
         except Exception as e:
             print(str(e))
-    
+    write_file(savepath+'pageinfo.json',json.dumps(pageinfo))
     parent.send("END")
     print("split time",time.time()-st)
     #return pageinfo
+from collections import defaultdict
+def meta_check(data):
+    savepath,meta_set=data[0],data[1]
+    pathinfo=json.loads(read_file(savepath+'pageinfo.json'))
+    meta_clause=defaultdict(list)
+    meta=set()
+    keys=json.load(open("keyclause.json"))
+    for page,path in pathinfo.items():
+        ocr1=read_file(path+'_ocr.txt').decode().lower()
+        check_list={1:ocr1.split(),2:[" ".join([i,j]) for i,j in zip(ocr1.split(),ocr1.split()[1:])],3:[" ".join([i,j,k]) for i,j,k in zip(ocr1.split(),ocr1.split()[1:],ocr1.split()[2:])]}
+        for key,value in keys['Lease Aggrement'].items():
+            for val in value:
+                if val.lower() in check_list[len(val.split())]:
+                    meta.add(key)
+                    meta_clause[page].append(key) if key not in meta_clause[page] else None
+    print(meta,meta_clause)
+    meta_set["data"]=meta
+    write_file(savepath+'metaclause.json',json.dumps(meta_clause))
 #pageinfo=convert_pdf_to_image_split('Contract/Residential-Lease-Agreement-4/','Contract/Residential-Lease-Agreement-4.pdf')

@@ -1,3 +1,4 @@
+print("hello.py",__name__)
 from unittest import result
 from flask import Flask, render_template, url_for, request, redirect
 from werkzeug.utils import secure_filename
@@ -8,7 +9,8 @@ from DBcode import mongoDB
 from flask_cors import CORS,cross_origin
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
-app = Flask(__name__)
+app = Flask(__name__,static_url_path='', 
+            static_folder='app/static')
 cors=CORS(app,resources={r'*':{"origins":"*"}})
 import os,io
 from multiprocessing import Process,Pipe
@@ -34,16 +36,21 @@ def sched():
     p.join()
 
 #schedular for preprocessing
+
 scheduler = BackgroundScheduler()
-scheduler.add_job(sched,trigger="interval",seconds=60,max_instances=1)
+scheduler.add_job(sched,trigger="interval",seconds=15,max_instances=1)
 print("schedular before start")
 scheduler.start()
 print("schedular after start")
+#print(scheduler.shutdown())
 atexit.register(lambda:scheduler.shutdown())
 print("scheduler finished")
+#scheduler.shutdown()
+#atexit.register(lambda:sched())
 
-@app.route("/", methods=["GET","POST","PUT"])
-def home():
+
+@app.route("/upload", methods=["GET","POST","PUT"])
+def upload():
     if request.method == "POST":
         file = request.files['file_upload']
         #print(type(file).read())
@@ -54,11 +61,14 @@ def home():
         path="Contract/"+file.filename
         print(path)
         print("POST")
-        #mongoDB.insert({"name":secure_filename(file.filename),"upload_date":dt.now().strftime(("%d/%m/%Y %H:%M:%S")),"queue":"Scan","status":"On Queue","doc_type":"Lease Agreement"})
+        mongoDB.insert({"name":secure_filename(file.filename),"upload_date":dt.now().strftime(("%d/%m/%Y %H:%M:%S")),"queue":"Scan","status":"On Queue","doc_type":"Lease Agreement"})
         return render_template("home.html",status=1)
     else:
         return render_template('home.html')
     return render_template('home.html')
+@app.route('/')
+def home():
+    return render_template('index3.html')
 @app.route('/getSignedurl')
 def getSignedurl():
     bucket = storage_client.bucket(bucket_name)
@@ -73,11 +83,17 @@ def getSignedurl():
     )
     return url
 
-
+@app.route('/getData')
+def getData():
+    date=request.values.get('date')
+    print("date",date)
+    #print(mongoDB.findall_json('1'))
+    return mongoDB.findall_json(date)
+    
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('page_not_found.html'), 404
-
+print("hello")
 if __name__ == "__main__":
     app.run(debug = True, port = 5000)
     #print(app.config)

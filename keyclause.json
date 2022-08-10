@@ -1,0 +1,9 @@
+{
+    "Lease Aggrement":{
+        "NON-SUFFICIENT FUNDS":["NSF","insufficient funds"],
+        "Late Fee":["late","rest is late","late rent"],
+        "SECURITY DEPOSIT":["SECURITY DEPOSIT"],
+        "Early Termination":["termination"],
+        "Smoking Policy":["smoking"],
+        "Pets":["pets"]    }
+}

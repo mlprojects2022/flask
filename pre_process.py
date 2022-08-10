@@ -1,3 +1,4 @@
+import multiprocessing
 import gcsconnect
 import os
 from DBcode import mongoDB
@@ -19,10 +20,19 @@ def preprocess():
         p=Process(target=gcsconnect.convert_pdf_to_image_split,args={(path.rstrip('.pdf')+'/',path,parent),})
         p.start()
         p.join()
+        print("spliting done")
         #print(pageinfo)
         p2.join()
+        print("ocr generation done")
+        print("meta clause identification started")
+        meta_set=multiprocessing.Manager().dict()
+        p3=Process(target=gcsconnect.meta_check,args={(path.rstrip('.pdf')+'/',meta_set),})
+        p3.start()
+        p3.join()
+        print("meta clause identification finished")
         #print(gcsconnect.ocr_maker(pageinfo))
-        mongoDB.update(result['_id'],'Validation1','Ready')
+        print(list(list(meta_set.values())[0]))
+        mongoDB.update(result['_id'],'Validation1','Ready',list(list(meta_set.values())[0]))
         print("pre process time",time.time()-st)
         #mongoDB.update(id,'Validation1','Ready')
         print('updated')
