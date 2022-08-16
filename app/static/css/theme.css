@@ -4481,6 +4481,9 @@ section {
     box-shadow: 0px 2px 7px rgb(0 0 0 / 10%);
     z-index: 900;
 }
+svg{
+    cursor: pointer;
+}
 #ref:hover{
     transform: rotate(120deg);
     transition: all 0.8s;

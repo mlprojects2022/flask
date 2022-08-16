@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% block content%}
+<div class="options">
+    <button type="button" class="btn btn-success" onclick="AddInfo();">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle"
+            viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+            <path
+                d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z">
+            </path>
+        </svg>
+        Add
+    </button>
+    <button class="btn btn-primary stop" onclick="EditInfo();" style="margin-left:15px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill"
+            viewBox="0 0 16 16">
+            <path
+                d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z" />
+        </svg>
+        Edit
+    </button>
+    <button type="button" class="btn btn-danger stop" style="margin-left:15px" onclick="deleteInfo();">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill"
+            viewBox="0 0 16 16">
+            <path
+                d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z">
+            </path>
+        </svg>
+        Delete
+    </button>
+</div>
+<table class="table  table-hover">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Category</th>
+            <th scope="col">Sub-Category</th>
+            <th scope="col">Meta Clause</th>
+            <th scope="col">Key Clause</th>
+            <!-- <th scope="col">Options</th> -->
+            <th>UUID</th>
+        </tr>
+    </thead>
+    <tbody id="metabody" class="stop">
+        
+    </tbody>
+</table>
+
+
+<!-- Modal -->
+<div class="modal fade" id="EditModel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <form action="{{ url_for('addMetaData') }}" method="post" id="formMeta" onsubmit="return false;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Meta Info</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <table class="table table-bordered">
+
+                    <tbody class="">
+                        <tr>
+                            <td scope="row">
+                                <div class="input-group"><span class="input-group-text">Category</span><input
+                                        type="text" class="form-control metaform" placeholder="" name="category" aria-label="Category">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td scope="row">
+                                <div class="input-group"><span class="input-group-text">Sub Category</span><input
+                                        type="text" class="form-control metaform" placeholder=""
+                                        name="sub_category" aria-label="Sub Category">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td scope="row">
+                                <div class="input-group"><span class="input-group-text">Meta Clause</span><input
+                                        type="text" class="form-control metaform" placeholder=""
+                                        name="meta_clause" aria-label="Meta Clause">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td scope="row">
+                                <div class="input-group"><span class="input-group-text">Key Clause</span><textarea
+                                        class="form-control metaform" placeholder="Eg: loss,cost,damage"
+                                        name="key_clause" aria-label="keyclause"></textarea>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr hidden>
+                            <td scope="row">
+                                <div class="input-group"><span class="input-group-text">UUID</span><input
+                                        type="text" class="form-control metaform" placeholder=""
+                                        name="uuid" aria-label="uuid">
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="modelclose">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveInfo();">Save</button>
+            </div>
+        </div>
+    </form>
+    </div>
+</div>
+<script>
+    function loadData(){
+        let str='';
+        $.get("/getMetaData",function(data){
+            data=JSON.parse(data);
+            console.log(data);
+            data1=data;
+            for(let i=0;i<data.length;i++){
+                str+='<tr><th scope="row">'+(i+1)+'</th><td>'+data[i]['category']+'</td><td>'+data[i]['sub_category']+'</td><td>'+data[i]['meta_clause']+'</td><td>'+data[i]['key_clause']+'</td><td>'+data[i]['_id']+'</td></tr>';
+            }
+            $("#metabody").html(str);
+            $("#metabody tr").click(function () {
+                if (this.className == "table-info") {
+                    this.className = "";
+                }
+                else {
+                    this.className = "table-info";
+                }
+            });
+        })
+    }
+    loadData();
+    
+
+    $(document).on('click', function (event) {
+        if (!$(event.target).closest('.stop').length) {
+            // ... clicked on the 'body', but not inside of #menutop
+            $("#metabody .table-info").removeClass();
+        }
+    });
+
+    function deleteInfo() {
+        let selectTD = $("#metabody .table-info");
+        if (selectTD.length > 0) {
+            let cfm = confirm("Are you sure want to delete");
+            if (cfm) {
+                for (let i = 0; i < selectTD.length; i++) {
+                    selectTD[i].remove();
+                }
+            }
+        }
+    }
+    function EditInfo() {
+        let selectTD = $("#metabody .table-info");
+        if (selectTD.length == 1) {
+            $(".metaform")[0].value = $("#metabody .table-info td")[0].innerText;
+            $(".metaform")[1].value = $("#metabody .table-info td")[1].innerText;
+            $(".metaform")[2].value = $("#metabody .table-info td")[2].innerText;
+            $(".metaform")[3].value = $("#metabody .table-info td")[3].innerText;
+            $(".metaform")[4].value = $("#metabody .table-info td")[4].innerText;
+            var myModal = new bootstrap.Modal(document.getElementById('EditModel'), {
+                keyboard: false
+            });
+            myModal.show();
+            console.log("Edit mode on");
+        }
+
+        else {
+            alert("Select exactly one row to edit");
+        }
+    }
+    function AddInfo(){
+        $(".metaform")[0].value = "";
+        $(".metaform")[1].value ="";
+        $(".metaform")[2].value = "";
+        $(".metaform")[3].value ="";
+        $(".metaform")[4].value = "";
+        var myModal = new bootstrap.Modal(document.getElementById('EditModel'), {
+            keyboard: false
+        });
+        myModal.show();
+    }
+    async function saveInfo(){
+        f=new FormData(document.getElementById("formMeta"));
+        res=await fetch('/addMetaData', {
+            method: 'POST',
+            body: f,
+          });
+          r=await res.text();
+          if(res.ok){
+            loadData();
+            
+            $("#modelclose").click();
+          }
+    }
+</script>
+{%endblock%}

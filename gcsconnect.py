@@ -1,4 +1,5 @@
 import os,io
+from difflib import get_close_matches
 from google.cloud import storage
 os.environ['GOOGLE_APPLICATION_CREDENTIALS']=os.environ['gcp']
 storage_client = storage.Client()
@@ -107,9 +108,10 @@ def meta_check(data):
         check_list={1:ocr1.split(),2:[" ".join([i,j]) for i,j in zip(ocr1.split(),ocr1.split()[1:])],3:[" ".join([i,j,k]) for i,j,k in zip(ocr1.split(),ocr1.split()[1:],ocr1.split()[2:])]}
         for key,value in keys['Lease Aggrement'].items():
             for val in value:
-                if val.lower() in check_list[len(val.split())]:
+                if get_close_matches(val.lower(),check_list[len(val.split())],cutoff=0.95):
                     meta.add(key)
                     meta_clause[page].append(key) if key not in meta_clause[page] else None
+                    break
     print(meta,meta_clause)
     meta_set["data"]=meta
     write_file(savepath+'metaclause.json',json.dumps(meta_clause))

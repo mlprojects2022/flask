@@ -4,7 +4,7 @@ import os
 from DBcode import mongoDB
 from multiprocessing import Process,Pipe    
 def preprocess():
-    result=mongoDB.updateReturn({'status':'On Queue'},{'status':'In Progress'})
+    result=mongoDB.updateReturn({'queue':'Scan'},{'queue':'In Progress'})
     print(result)
     if result:
         path='Contract/'+result['name']
@@ -32,7 +32,7 @@ def preprocess():
         print("meta clause identification finished")
         #print(gcsconnect.ocr_maker(pageinfo))
         print(list(list(meta_set.values())[0]))
-        mongoDB.update(result['_id'],'Validation1','Ready',list(list(meta_set.values())[0]))
+        mongoDB.update(result['_id'],'Ready',list(list(meta_set.values())[0]))
         print("pre process time",time.time()-st)
         #mongoDB.update(id,'Validation1','Ready')
         print('updated')

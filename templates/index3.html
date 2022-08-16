@@ -41,7 +41,8 @@
         <header class="header-desktop3 d-none d-lg-block">
             <div class="section__content section__content--p35">
                 <div class="header3-wrap">
-                    <div class="header__logo">
+                    <div class="header__logo" style="color: white;">Intelligent Contract Management System
+
                         <a href="#">
                             <!-- <img src="images/icon/logo-white.png" alt="CoolAdmin" /> -->
                         </a>
@@ -616,7 +617,6 @@
                                             <th>Filename</th>
                                             <th>MetaClause</th>
                                             <th>Queue</th>
-                                            <th>Status</th>
                                             <th>Upload date</th>
                                             <th>Options</th>
                                             <th>Id</th>
@@ -647,7 +647,7 @@
             </section>
             <!-- END COPYRIGHT-->
         </div>
-
+        <a id="downloadAnchorElem" style="display:none"></a>
     </div>
 
     <!-- Jquery JS-->
@@ -674,6 +674,8 @@
     <!-- Main JS-->
     <script src="js/main.js"></script>
     <script>
+        function downloadMeta(path){$.get("/getSignedurl?filename="+path+"&action=get",function(data){
+            window.location=data});}
         $("#date").val(new Date().getFullYear()+"-"+("0"+(new Date().getMonth()+1)).slice(-2)+"-"+("0"+(new Date().getDate())).slice(-2));
         function refresh(){
             let date=$("#date").val().split('-');
@@ -684,7 +686,7 @@
                 data='';
                 for(let i=0;i<response.length;i++)
                 {
-                    data+='<tr class="tr-shadow"><td><label class="au-checkbox"><input type="checkbox"><span class="au-checkmark"></span></label></td><td>'+response[i].doc_type+'</td><td><span class="">'+response[i].name+'</span></td><td><span class="">'+response[i].metaclause+'</span></td><td class="desc">'+response[i].queue+'</td><td><span class="status--process">'+response[i].status+'</span></td><td>'+response[i].upload_date+'</td><td><div class="table-data-feature"><button class="item" data-toggle="tooltip" data-placement="top" title="Send"><i class="zmdi zmdi-mail-send"></i></button><button class="item" data-toggle="tooltip" data-placement="top" title="Edit"><i class="zmdi zmdi-edit"></i></button><button class="item" data-toggle="tooltip" data-placement="top" title="Delete"><i class="zmdi zmdi-delete"></i></button><button class="item" data-toggle="tooltip" data-placement="top" title="More"><i class="zmdi zmdi-more"></i></button></div></td><td>'+response[i]._id+'</td></tr><tr class="spacer"></tr>';
+                    data+='<tr class="tr-shadow"><td><label class="au-checkbox"><input type="checkbox"><span class="au-checkmark"></span></label></td><td>'+response[i].doc_type+'</td><td><span class="">'+response[i].name+'</span></td><td><span class="">'+response[i].metaclause+'</span></td><td class="desc">'+response[i].queue+'</td><td>'+response[i].upload_date+'</td><td><div class="table-data-feature"><button class="item" data-toggle="tooltip" data-placement="top" title="Download" onclick=downloadMeta("Contract/'+response[i].name.slice(0,-4)+'/metaclause.json")><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#808080" class="bi bi-download" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg></button><button class="item" data-toggle="tooltip" data-placement="top" title="Edit"><i class="zmdi zmdi-edit"></i></button><button class="item" data-toggle="tooltip" data-placement="top" title="Delete"><i class="zmdi zmdi-delete"></i></button><button class="item" data-toggle="tooltip" data-placement="top" title="More"><i class="zmdi zmdi-more"></i></button></div></td><td>'+response[i]._id+'</td></tr><tr class="spacer"></tr>';
             
                 }
                 $("#tablebody").html(data);

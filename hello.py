@@ -34,9 +34,10 @@ def sched():
     p=Process(target=preprocess)
     p.start()
     p.join()
+    return ''
 
 #schedular for preprocessing
-
+#jupyter notebook --notebook D:/
 scheduler = BackgroundScheduler()
 scheduler.add_job(sched,trigger="interval",seconds=15,max_instances=1)
 print("schedular before start")
@@ -45,8 +46,8 @@ print("schedular after start")
 #print(scheduler.shutdown())
 atexit.register(lambda:scheduler.shutdown())
 print("scheduler finished")
-#scheduler.shutdown()
-#atexit.register(lambda:sched())
+# scheduler.shutdown()
+# atexit.register(lambda:)
 
 
 @app.route("/upload", methods=["GET","POST","PUT"])
@@ -61,7 +62,7 @@ def upload():
         path="Contract/"+file.filename
         print(path)
         print("POST")
-        mongoDB.insert({"name":secure_filename(file.filename),"upload_date":dt.now().strftime(("%d/%m/%Y %H:%M:%S")),"queue":"Scan","status":"On Queue","doc_type":"Lease Agreement"})
+        mongoDB.insert({"name":secure_filename(file.filename),"upload_date":dt.now().strftime(("%d/%m/%Y %H:%M:%S")),"queue":"Scan","doc_type":"Lease Agreement"})
         return render_template("home.html",status=1)
     else:
         return render_template('home.html')
@@ -79,17 +80,46 @@ def getSignedurl():
     url=blob.generate_signed_url(
         expiration=datetime.timedelta(minutes=2),
         method=action,
-        version='v4'
-    )
+        version='v4',
+        response_disposition='attachment;filename='+filename.split('/')[1]+"_MetaClause.json")
     return url
 
+@app.route('/Editinfo')
+def Editinfo():
+    return render_template('EditInfo.html')
+
+#api call
 @app.route('/getData')
 def getData():
     date=request.values.get('date')
     print("date",date)
     #print(mongoDB.findall_json('1'))
     return mongoDB.findall_json(date)
-    
+
+#api call
+@app.route("/getMetaData")
+def getMetaData():
+    #print(mongoDB.findall_json('1'))
+    return mongoDB.getMetaInfo()
+
+#api call
+@app.route("/addMetaData",methods=["POST"])
+def addMetaData():
+    #print(mongoDB.findall_json('1'))
+    print(request.values.to_dict())
+    data=request.values.to_dict()
+    if data['uuid']=='':
+        mongoDB.addMetaInfo(request.values.to_dict())
+        print("added")
+    else:
+        id=data['uuid']
+        del data['uuid']
+        print(mongoDB.editMetaInfo(id,data))
+        print("updated")
+    #mongoDB.addMetaInfo(request.values.to_dict())
+    return "1"
+ 
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('page_not_found.html'), 404
